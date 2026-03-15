@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="IniParser/IniParser.csproj" />
+  <Project Path="IniParserTests/IniParserTests.csproj" />
+</Solution>
