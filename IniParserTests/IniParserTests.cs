@@ -8,9 +8,9 @@ public sealed class IniParserTests
     [TestMethod]
     public void TryParse1()
     {
-        const string raw = @";A comment without a section
+        const string raw = @";A comment without a value or section
 
-V1 = A value without a setting
+V1 = A value without a section
 
 [S1]
 V2=Value 1
@@ -34,7 +34,7 @@ V4=A value in section 2";
         Assert.AreEqual("", iniFile[0][0].SectionName);
         Assert.AreEqual("", iniFile[0][0].SettingName);
         Assert.AreEqual("", iniFile[0][0].SettingValue);
-        Assert.AreEqual("A comment without a section", iniFile[0][0].Remark);
+        Assert.AreEqual("A comment without a value or section", iniFile[0][0].Remark);
         Assert.AreEqual("", iniFile[0][1].SectionName);
         Assert.AreEqual("V1", iniFile[0][1].SettingName);
         Assert.AreEqual("A value without a setting", iniFile[0][1].SettingValue);
