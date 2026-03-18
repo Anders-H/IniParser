@@ -9,7 +9,6 @@ public sealed class IniParserTests
     public void TryParse1()
     {
         const string raw = @";A comment without a value or section
-
 V1 = A value without a section
 
 [S1]
