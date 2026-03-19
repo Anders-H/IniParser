@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+  </Folder>
   <Project Path="IniParser/IniParser.csproj" />
   <Project Path="IniParserTests/IniParserTests.csproj" />
 </Solution>

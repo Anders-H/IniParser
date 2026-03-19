@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace IniParser;
@@ -31,9 +30,19 @@ public class Parser
             if (string.IsNullOrWhiteSpace(r))
                 continue;
 
-            if (IsSection(row, lineNumber, messageBuilder, out var iniSection))
+            if (IsSection(row, lineNumber, result.Last().SectionName, messageBuilder, out var iniSection))
             {
+                if (result.Count == 1 && result.First().IsEmpty())
+                {
+                    result.RemoveAt(0);
+                    result.Add(iniSection);
+                    continue;
+                }
 
+                if (result.First().IsSameAs(iniSection))
+                    result.First().Merge(iniSection);
+                else
+                    result.Add(iniSection);
             }
             else if (IsValue(row, lineNumber, currentSection.SectionName, messageBuilder, out var iniValueValue))
             {
@@ -73,10 +82,21 @@ public class Parser
         return true;
     }
 
-    private bool IsSection(string row, int lineNumber, StringBuilder messageBuilder, out IniSection s)
+    private bool IsSection(string row, int lineNumber, string currentSection, StringBuilder messageBuilder, out IniSection s)
     {
-        s = new IniSection("Hello");
-        return false;
+        s = new IniSection(currentSection);
+        var openingBrackets = row.IndexOf('[');
+
+        if (openingBrackets < 0)
+            return false;
+
+        var closingBrackets = row.IndexOf(']');
+
+        if (closingBrackets <= openingBrackets)
+        {
+            messageBuilder.AppendLine()
+        }
+
     }
 
     private bool IsValue(string row, int lineNumber, string currentSection, StringBuilder messageBuilder, out IniValue v)

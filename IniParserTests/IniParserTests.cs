@@ -1,4 +1,5 @@
-﻿using IniParser;
+﻿using System.Security.Cryptography.X509Certificates;
+using IniParser;
 
 namespace IniParserTests;
 
@@ -6,7 +7,67 @@ namespace IniParserTests;
 public sealed class IniParserTests
 {
     [TestMethod]
-    public void TryParse1()
+    public void IniSectionIsEmpty()
+    {
+        var s = new IniSection("");
+        Assert.IsTrue(s.IsEmpty());
+        s.SectionName = "X";
+        Assert.IsFalse(s.IsEmpty());
+        s.SectionName = "";
+        s.Add(new IniValue());
+        Assert.IsFalse(s.IsEmpty());
+        s.SectionName = "Y";
+        Assert.IsFalse(s.IsEmpty());
+        s.SectionName = "";
+        s.Clear();
+        Assert.IsTrue(s.IsEmpty());
+    }
+
+    [TestMethod]
+    public void IniSectionIsSameAs()
+    {
+        var s1 = new IniSection("A");
+        var s2 = new IniSection("A");
+        Assert.IsTrue(s1.IsSameAs(s2));
+        s2.SectionName = "B";
+        Assert.IsFalse(s1.IsSameAs(s2));
+    }
+
+    [TestMethod]
+    public void IniSectionMerge()
+    {
+        var s1 = new IniSection("A");
+        var s2 = new IniSection("A");
+        s1.Add(new IniValue(2, "A", "S1", "V1", "R1"));
+        s2.Add(new IniValue(3, "A", "S2", "V2", "R2"));
+        s2.Add(new IniValue(3, "A", "S2", "V2", "R3"));
+        s1.Merge(s2);
+        Assert.AreEqual("A", s1.SectionName);
+        Assert.HasCount(2, s1);
+        Assert.AreEqual("S1", s1[0].SettingName);
+        Assert.AreEqual("V1", s1[0].SettingValue);
+        Assert.AreEqual("R1", s1[0].Remark);
+        Assert.AreEqual("S2", s1[1].SettingName);
+        Assert.AreEqual("V2", s1[1].SettingValue);
+        Assert.AreEqual("R2 R3", s1[1].Remark);
+    }
+
+    [TestMethod]
+    public void IniSectionGetValueSameAs()
+    {
+        var s = new IniSection("A")
+        {
+            new IniValue(1, "A", "S1", "V1", "R1"),
+            new IniValue(2, "A", "S1", "V1", "R2"),
+            new IniValue(3, "A", "S1", "V2", "R3")
+        };
+
+        Assert.IsNull(s.GetValueSameAs(new IniValue(1, "A", "S1", "V3", "")));
+        Assert.AreEqual("V2", s.GetValueSameAs(new IniValue(1, "A", "S1", "V2", ""))!.SettingValue);
+    }
+
+    [TestMethod]
+    public void TryParse()
     {
         const string raw = @";A comment without a value or section
 V1 = A value without a section

@@ -24,4 +24,12 @@ public class IniValue
         SettingValue = settingValue;
         Remark = remark;
     }
+
+    public void Merge(IniValue other)
+    {
+        if (string.IsNullOrEmpty(Remark))
+            Remark = other.Remark;
+        else if (!string.IsNullOrEmpty(Remark) && !string.IsNullOrEmpty(other.Remark))
+            Remark = $"{Remark} {other.Remark}".Trim();
+    }
 }
