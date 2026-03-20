@@ -15,34 +15,33 @@ public class Parser
 
     public bool TryParse(out string message, out IniFile iniFile)
     {
-        iniFile = [];
+        iniFile = [new IniSection("")];
         var rows = _raw.Split([Environment.NewLine], StringSplitOptions.None);
-        var result = new IniFile { new IniSection("") };
         var lineNumber = 0;
         var messageBuilder = new StringBuilder();
 
         foreach (var row in rows)
         {
-            var currentSection = result.Last();
+            var currentSection = iniFile.Last();
             lineNumber++;
             var r = row.Trim();
 
             if (string.IsNullOrWhiteSpace(r))
                 continue;
 
-            if (IsSection(row, lineNumber, result.Last().SectionName, messageBuilder, out var iniSection))
+            if (IsSection(row, lineNumber, iniFile.Last().SectionName, messageBuilder, out var iniSection))
             {
-                if (result.Count == 1 && result.First().IsEmpty())
+                if (iniFile.Count == 1 && iniFile.First().IsEmpty())
                 {
-                    result.RemoveAt(0);
-                    result.Add(iniSection);
+                    iniFile.RemoveAt(0);
+                    iniFile.Add(iniSection);
                     continue;
                 }
 
-                if (result.First().IsSameAs(iniSection))
-                    result.First().Merge(iniSection);
+                if (iniFile.First().IsSameAs(iniSection))
+                    iniFile.First().Merge(iniSection);
                 else
-                    result.Add(iniSection);
+                    iniFile.Add(iniSection);
             }
             else if (IsValue(row, lineNumber, currentSection.SectionName, messageBuilder, out var iniValueValue))
             {
@@ -53,7 +52,7 @@ public class Parser
                 else
                 {
                     currentSection = new IniSection(iniValueValue.SectionName);
-                    result.Add(currentSection);
+                    iniFile.Add(currentSection);
                     currentSection.Add(iniValueValue);
                 }
             }
@@ -66,7 +65,7 @@ public class Parser
                 else
                 {
                     currentSection = new IniSection(iniValueComment.SectionName);
-                    result.Add(currentSection);
+                    iniFile.Add(currentSection);
                     currentSection.Add(iniValueComment);
                 }
             }
@@ -94,9 +93,17 @@ public class Parser
 
         if (closingBrackets <= openingBrackets)
         {
-            messageBuilder.AppendLine()
+            messageBuilder.AppendLine($"Row number {lineNumber}: Closing brackets before opening brackets.");
+            return false;
         }
 
+        s.SectionName = row.Substring(openingBrackets + 1, closingBrackets - openingBrackets - 1);
+        var commentStart = row.IndexOf(';', closingBrackets);
+
+        if (commentStart > closingBrackets)
+            s.Comment = row.Substring(commentStart + 1).Trim();
+
+        return true;
     }
 
     private bool IsValue(string row, int lineNumber, string currentSection, StringBuilder messageBuilder, out IniValue v)

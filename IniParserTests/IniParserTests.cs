@@ -97,17 +97,13 @@ V4=A value in section 2";
         Assert.AreEqual("A comment without a value or section", iniFile[0][0].Remark);
         Assert.AreEqual("", iniFile[0][1].SectionName);
         Assert.AreEqual("V1", iniFile[0][1].SettingName);
-        Assert.AreEqual("A value without a setting", iniFile[0][1].SettingValue);
+        Assert.AreEqual("A value without a section", iniFile[0][1].SettingValue);
         Assert.AreEqual("", iniFile[0][1].Remark);
 
-        Assert.HasCount(2, iniFile[2]);
+        Assert.HasCount(3, iniFile[1]);
+        Assert.AreEqual("Section 2 starts here", iniFile[2].Comment);
         Assert.AreEqual("S2", iniFile[2][0].SectionName);
-        Assert.AreEqual("", iniFile[2][0].SettingName);
-        Assert.AreEqual("", iniFile[2][0].SettingValue);
-        Assert.AreEqual("Section 2 starts here", iniFile[2][0].Remark);
-        Assert.AreEqual("S2", iniFile[2][1].SectionName);
-        Assert.AreEqual("V4", iniFile[2][1].SettingName);
-        Assert.AreEqual("A value in section 2", iniFile[2][1].SettingValue);
-        Assert.AreEqual("", iniFile[2][1].Remark);
+        Assert.AreEqual("V4", iniFile[2][0].SettingName);
+        Assert.AreEqual("A value in section 2", iniFile[2][0].SettingValue);
     }
 }

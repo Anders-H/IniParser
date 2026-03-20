@@ -6,10 +6,12 @@ namespace IniParser;
 public class IniSection : List<IniValue>
 {
     public string SectionName { get; set; }
+    public string Comment { get; set; }
 
     public IniSection(string sectionName)
     {
         SectionName = sectionName;
+        Comment = "";
     }
 
     public bool IsEmpty() =>
