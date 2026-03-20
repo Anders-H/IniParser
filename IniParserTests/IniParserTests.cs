@@ -1,5 +1,6 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using IniParser;
+﻿using IniParser;
+using Mono.Cecil.Rocks;
+using System.Security.Cryptography.X509Certificates;
 
 namespace IniParserTests;
 
@@ -105,5 +106,36 @@ V4=A value in section 2";
         Assert.AreEqual("S2", iniFile[2][0].SectionName);
         Assert.AreEqual("V4", iniFile[2][0].SettingName);
         Assert.AreEqual("A value in section 2", iniFile[2][0].SettingValue);
+    }
+
+    [TestMethod]
+    public void Render()
+    {
+        const string raw = @";A comment without a value or section
+V1 = A value without a section
+
+[S1]
+V2=Value 1
+V3=Value 2; With comment
+
+;Also, this is a comment in S1
+[S2];Section 2 starts here
+V4=A value in section 2";
+        const string resultText = @"; A comment without a value or section
+V1 = A value without a section
+
+[S1]
+V2 = Value 1
+V3 = Value 2; With comment
+
+; Also, this is a comment in S1
+[S2]; Section 2 starts here
+V4 = A value in section 2";
+        var parser = new Parser(raw);
+        var success = parser.TryParse(out var message, out var iniFile);
+        Assert.IsTrue(success);
+        var result = iniFile.Render();
+
+        Assert.AreEqual(resultText, result);
     }
 }
