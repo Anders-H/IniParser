@@ -1,6 +1,5 @@
-﻿using IniParser;
-using Mono.Cecil.Rocks;
-using System.Security.Cryptography.X509Certificates;
+﻿#nullable enable
+using IniParser;
 
 namespace IniParserTests;
 
@@ -47,10 +46,10 @@ public sealed class IniParserTests
         Assert.HasCount(2, s1);
         Assert.AreEqual("S1", s1[0].SettingName);
         Assert.AreEqual("V1", s1[0].SettingValue);
-        Assert.AreEqual("R1", s1[0].Remark);
+        Assert.AreEqual("R1", s1[0].Comment);
         Assert.AreEqual("S2", s1[1].SettingName);
         Assert.AreEqual("V2", s1[1].SettingValue);
-        Assert.AreEqual("R2 R3", s1[1].Remark);
+        Assert.AreEqual("R2 R3", s1[1].Comment);
     }
 
     [TestMethod]
@@ -95,11 +94,11 @@ V4=A value in section 2";
         Assert.AreEqual("", iniFile[0][0].SectionName);
         Assert.AreEqual("", iniFile[0][0].SettingName);
         Assert.AreEqual("", iniFile[0][0].SettingValue);
-        Assert.AreEqual("A comment without a value or section", iniFile[0][0].Remark);
+        Assert.AreEqual("A comment without a value or section", iniFile[0][0].Comment);
         Assert.AreEqual("", iniFile[0][1].SectionName);
         Assert.AreEqual("V1", iniFile[0][1].SettingName);
         Assert.AreEqual("A value without a section", iniFile[0][1].SettingValue);
-        Assert.AreEqual("", iniFile[0][1].Remark);
+        Assert.AreEqual("", iniFile[0][1].Comment);
 
         Assert.HasCount(3, iniFile[1]);
         Assert.AreEqual("Section 2 starts here", iniFile[2].Comment);
@@ -127,15 +126,17 @@ V1 = A value without a section
 [S1]
 V2 = Value 1
 V3 = Value 2; With comment
-
 ; Also, this is a comment in S1
+
 [S2]; Section 2 starts here
-V4 = A value in section 2";
+V4 = A value in section 2
+";
         var parser = new Parser(raw);
         var success = parser.TryParse(out var message, out var iniFile);
         Assert.IsTrue(success);
+        Assert.IsTrue(string.IsNullOrWhiteSpace(message));
         var result = iniFile.Render();
-
+        System.Diagnostics.Debug.WriteLine(result);
         Assert.AreEqual(resultText, result);
     }
 }

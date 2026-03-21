@@ -45,29 +45,23 @@ public class Parser
             }
             else if (IsValue(row, lineNumber, currentSection.SectionName, messageBuilder, out var iniValueValue))
             {
-                if (iniValueValue.SectionName == currentSection.SectionName)
-                {
-                    currentSection.Add(iniValueValue);
-                }
-                else
+                if (iniValueValue.SectionName != currentSection.SectionName)
                 {
                     currentSection = new IniSection(iniValueValue.SectionName);
                     iniFile.Add(currentSection);
-                    currentSection.Add(iniValueValue);
                 }
+
+                currentSection.Add(iniValueValue);
             }
             else if (IsComment(row, lineNumber, currentSection.SectionName, messageBuilder, out var iniValueComment))
             {
-                if (iniValueComment.SectionName == currentSection.SectionName)
-                {
-                    currentSection.Add(iniValueComment);
-                }
-                else
+                if (iniValueComment.SectionName != currentSection.SectionName)
                 {
                     currentSection = new IniSection(iniValueComment.SectionName);
                     iniFile.Add(currentSection);
-                    currentSection.Add(iniValueComment);
                 }
+
+                currentSection.Add(iniValueComment);
             }
             else
             {
@@ -81,7 +75,7 @@ public class Parser
         return true;
     }
 
-    private bool IsSection(string row, int lineNumber, string currentSection, StringBuilder messageBuilder, out IniSection s)
+    private static bool IsSection(string row, int lineNumber, string currentSection, StringBuilder messageBuilder, out IniSection s)
     {
         s = new IniSection(currentSection);
         var openingBrackets = row.IndexOf('[');
@@ -123,8 +117,8 @@ public class Parser
 
             if (commentPosition > -1)
             {
-                var newValuePart = row.Substring(0, commentPosition).Trim();
-                v.Remark = row.Substring(commentPosition + 1).Trim();
+                var newValuePart = valuePart.Substring(0, commentPosition).Trim();
+                v.Comment = valuePart.Substring(commentPosition + 1).Trim();
                 valuePart = newValuePart;
             }
 
@@ -147,13 +141,13 @@ public class Parser
         }
     }
 
-    private bool IsComment(string row, int lineNumber, string currentSection, StringBuilder messageBuilder, out IniValue v)
+    private static bool IsComment(string row, int lineNumber, string currentSection, StringBuilder messageBuilder, out IniValue v)
     {
         v = new IniValue(lineNumber, currentSection);
 
         if (!row.StartsWith(";"))
         {
-            v.Remark = row;
+            v.Comment = row;
             return false;
         }
 
@@ -163,7 +157,7 @@ public class Parser
         if (string.IsNullOrWhiteSpace(row))
             row = "Empty comment.";
 
-        v.Remark = row;
+        v.Comment = row;
         return true;
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using System.Text;
 
 namespace IniParser;
@@ -14,28 +15,43 @@ public class IniFile : List<IniSection>
         {
             if (section.SectionName != currentSection)
             {
-                if (s.ToString() == "")
-                {
-                    s.AppendLine(string.IsNullOrWhiteSpace(section.Comment)
-                        ? $"[{section.SectionName}]"
-                        : $"[{section.SectionName}]; {section.Comment}");
-
-                    currentSection = section.SectionName;
-                }
-            }
-            else
-            {
+                currentSection = section.SectionName;
                 s.AppendLine();
+
                 s.AppendLine(string.IsNullOrWhiteSpace(section.Comment)
                     ? $"[{section.SectionName}]"
                     : $"[{section.SectionName}]; {section.Comment}");
             }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(section.SectionName))
+                {
+                    if (!string.IsNullOrWhiteSpace(section.Comment))
+                        s.AppendLine($"; {section.Comment}");
+                }
+                else
+                {
+                    s.AppendLine();
+
+                    s.AppendLine(string.IsNullOrWhiteSpace(section.Comment)
+                        ? $"[{section.SectionName}]"
+                        : $"[{section.SectionName}]; {section.Comment}");
+                }
+            }
 
             foreach (var v in section)
             {
-                s.AppendLine(string.IsNullOrWhiteSpace(v.Remark)
-                    ? $"{v.SettingName} = {v.SettingValue}".Trim()
-                    : $"{v.SettingName} = {v.SettingValue}; {v.Remark}".Trim());
+                if (string.IsNullOrWhiteSpace(v.SettingName))
+                {
+                    if (!string.IsNullOrWhiteSpace(v.Comment))
+                        s.AppendLine($"; {v.Comment}");
+                }
+                else
+                {
+                    s.AppendLine(string.IsNullOrWhiteSpace(v.Comment)
+                        ? $"{v.SettingName} = {v.SettingValue}".Trim()
+                        : $"{v.SettingName} = {v.SettingValue}; {v.Comment}".Trim());
+                }
             }
         }
 
