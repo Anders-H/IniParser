@@ -4,6 +4,22 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <PackageId>WinSoftIniParser</PackageId>
+    <Title>INI file parser</Title>
+    <Version>1.0</Version>
+    <Authors>WinSoft.se</Authors>
+    <Description>Simple case sensitive ini file parser, .NET Standard 2.0.</Description>
+    <PackageProjectUrl>https://github.com/Anders-H/IniParser/blob/main/README.md</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Anders-H/IniParser</RepositoryUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
